@@ -4,6 +4,9 @@ export default class Tree {
   constructor(array) {
     this.root = this.buildTree(array);
     this.levelOrderTraversal = [];
+    this.inorderTraversal = [];
+    this.preorderTraversal = [];
+    this.postorderTraversal = [];
   }
 
   _sortArray(array) {
@@ -123,31 +126,98 @@ export default class Tree {
   }
 
   inorder() {
+    this.inorderTraversal = [];
+    return this.recInorder();
+  }
 
+  recInorder(func = this.toArray, node = this.root) {
+    if (node === null) {
+      return;
+    }
+
+    this.recInorder(func, node.left);
+    func(this.inorderTraversal, node.data);
+    this.recInorder(func, node.right);
+
+    return this.inorderTraversal;
   }
 
   preorder() {
+    this.preorderTraversal = [];
+    return this.recPreorder();
+  }
 
+  recPreorder(func = this.toArray, node = this.root) {
+    if (node === null) {
+      return;
+    }
+
+    func(this.preorderTraversal, node.data);
+    this.recPreorder(func, node.left);
+    this.recPreorder(func, node.right);
+
+    return this.preorderTraversal;
   }
 
   postorder() {
-
+    this.postorderTraversal = [];
+    return this.recPostorder();
   }
 
-  height() {
+  recPostorder(func = this.toArray, node = this.root) {
+    if (node === null) {
+      return;
+    }
 
+    this.recPostorder(func, node.left);
+    this.recPostorder(func, node.right);
+    func(this.postorderTraversal, node.data);
+
+    return this.postorderTraversal;
   }
 
-  depth() {
+  height(node) {
+    if (node === null) {
+      return 0;
+    }
 
+    const leftH = this.height(node.left);
+    const rightH = this.height(node.right);
+    
+    return Math.max(leftH, rightH) + 1;
+  }
+
+  depth(data, node = this.root) {
+    if (node.data === data.data) {
+      return 0;
+    }
+
+    if (data.data < node.data) {
+      return this.depth(data, node.left) + 1;
+    }
+
+    if (data.data > node.data) {
+      return this.depth(data, node.right) + 1;
+    }
   }
 
   isBalanced() {
+    const nodes = this.inorder();
+    for (let i = 0; i < nodes.length; i++) {
+      const node = this.find(nodes[i]);
+      const leftTree = this.height(node.left);
+      const rightTree = this.height(node.right);
 
+      if (Math.abs(leftTree - rightTree) > 1) {
+        return false
+      }
+      return true;
+    }
   }
 
   rebalance() {
-    
+    const currentTreeArray = this.inorder();
+    this.root = this.buildTree(currentTreeArray);
   }
 
   prettyPrint(node, prefix = '', isLeft = true) {
